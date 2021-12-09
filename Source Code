@@ -1,0 +1,345 @@
+//
+// Levi Hohenbrink
+// MP4 - Dr. Estell
+// 12/9/2021
+// 
+// This C++ Program is for a game known as Rubber Ducks vs. Peeps.
+// This type of game is a text based game, similar to that of games like Adventure.
+// This game has many different outcomes and only takes one player to play.
+// It is you against the game and you have to make the right decisions to win and/or
+// keep playing. There are multiple different options you can make each turn. If you 
+// make the right decisions throughout the game you will be able to lead yourself to
+// winning the game, however if you make the wrong decision you could be carried off
+// by a vuture and lose.
+// 
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+const int HAZARDS_NUM = 3;
+int hazards[3];
+
+
+// function prototypes
+
+char getChoice(string roundAction);
+int aimAndShootDirection(vector<vector<int>> adjRooms, int currentRoom);
+int gettingNewLocation(int currentRoom, vector<vector<int>> adjRooms);
+int getRoom(int currentRoom);
+void displayHazardsNearby(vector<vector<int>> map, int currentRoom, int round);
+int checkHazard(int& currentRoom);
+vector<int> getAdjacentRooms(vector<vector<int>> map, int currentRoom);
+bool isValidMove(int to, vector<int> connections);
+void printCurrentRoom(int room);
+void printAdjacentRooms(vector<int> rooms);
+void displayOverallInstructions();
+void fillHazards();
+
+int main() {
+	int currentRoom = 0;
+	int duckWin = 0;
+	int peepWin = 0;
+
+	displayOverallInstructions();
+
+	vector<vector<int>> adjRooms
+	{
+	{0},  // no room at 0
+	{2, 5, 8},    // adjacent rooms from 1
+	{1, 3, 10},   // adjacent rooms from 2
+	{2, 4, 12},   // adjacent rooms from 3
+	{3, 5, 14},   // adjacent rooms from 4
+	{1, 4, 6},    // adjacent rooms from 5
+	{5, 7, 15},   // adjacent rooms from 6
+	{6, 8, 17},   // adjacent rooms from 7
+	{1, 7, 9},    // adjacent rooms from 8
+	{8, 10, 18},  // adjacent rooms from 9
+	{2, 9, 11},   // adjacent rooms from 10
+	{10, 12, 19}, // adjacent rooms from 11
+	{3, 11, 13},  // adjacent rooms from 12
+	{12, 14, 20}, // adjacent rooms from 13
+	{4, 13, 15},  // adjacent rooms from 14
+	{6, 14, 16},  // adjacent rooms from 15
+	{15, 17, 20}, // adjacent rooms from 16
+	{7, 16, 18},  // adjacent rooms from 17
+	{9, 17, 19},  // adjacent rooms from 18
+	{11, 18, 20}, // adjacent rooms from 19
+	{13, 16, 19}  // adjacent rooms from 20
+	};
+
+	struct Round
+	{
+		bool roundOver;
+		int result;
+	};
+
+	// First Round
+	fillHazards();
+	Round one;
+	one.roundOver = false;
+	srand(time(0));
+	currentRoom = rand() % 20 + 1;
+	one.result = -1;
+	while (one.roundOver == false) {
+		one.result = checkHazard(currentRoom);
+		if (one.result == 0) {
+			cout << "You lose this round" << endl; peepWin++;
+			one.roundOver = true; return 0;
+		}
+
+		displayHazardsNearby(adjRooms, currentRoom, 1);
+		vector<int> adjacentRooms = getAdjacentRooms(adjRooms, currentRoom);
+		printCurrentRoom(currentRoom);
+		cout << "Tunnels lead to rooms ";
+		printAdjacentRooms(adjacentRooms);
+
+		char action = getChoice("Candy Cane Arrow");
+
+		switch (action) {
+		case 'I': displayOverallInstructions(); break;
+		case 'E': cout << "Thank you for playing!" << endl; exit(0); break;
+		case 'C': one.result = aimAndShootDirection(adjRooms, currentRoom); break;
+		case 'M': currentRoom = gettingNewLocation(currentRoom, adjRooms); break;
+		}
+		if (one.result == 1) {
+			cout << "You win this round" << endl; duckWin++;
+			one.roundOver = true;
+		}
+	}
+
+
+	// Second Round
+
+	Round two;
+	fillHazards();
+	two.roundOver = false;
+	srand(time(0));
+	currentRoom = rand() % 20 + 1;
+	while (two.roundOver == false) {
+		two.result = checkHazard(currentRoom);
+		if (two.result == 0) {
+			cout << "You lose this round" << endl; peepWin++;
+			two.roundOver = true; return 0;
+		}
+
+		displayHazardsNearby(adjRooms, currentRoom, 1);
+		vector<int> adjacentRooms = getAdjacentRooms(adjRooms, currentRoom);
+		printCurrentRoom(currentRoom);
+		cout << "Tunnels lead to rooms ";
+		printAdjacentRooms(adjacentRooms);
+
+		char action = getChoice("Toothpick Sword");
+
+		switch (action) {
+		case 'I': displayOverallInstructions(); break;
+		case 'E': cout << "Thank you for playing!" << endl; exit(0); break;
+		case 'T': two.result = aimAndShootDirection(adjRooms, currentRoom); break;
+		case 'M': currentRoom = gettingNewLocation(currentRoom, adjRooms); break;
+		}
+		if (two.result == 1) {
+			cout << "You win this round" << endl; duckWin++;
+			two.roundOver = true;
+		}
+	}
+
+	// Third Round
+	Round three;
+	fillHazards();
+	three.roundOver = false;
+	srand(time(0));
+	currentRoom = rand() % 20 + 1;
+	while (three.roundOver == false) {
+		three.result = checkHazard(currentRoom);
+		if (three.result == 0) {
+			cout << "You lose this round" << endl; peepWin++;
+			three.roundOver = true; return 0;
+		}
+
+		displayHazardsNearby(adjRooms, currentRoom, 1);
+		vector<int> adjacentRooms = getAdjacentRooms(adjRooms, currentRoom);
+		printCurrentRoom(currentRoom);
+		cout << "Tunnels lead to rooms ";
+		printAdjacentRooms(adjacentRooms);
+
+		char action = getChoice("Pastry Torch");
+
+		switch (action) {
+		case 'I': displayOverallInstructions(); break;
+		case 'E': cout << "Thank you for playing!" << endl; exit(0); break;
+		case 'T': three.result = aimAndShootDirection(adjRooms, currentRoom); break;
+		case 'M': currentRoom = gettingNewLocation(currentRoom, adjRooms); break;
+		}
+		if (three.result == 1) {
+			cout << "You win this round" << endl; duckWin++;
+			three.roundOver = true; break;
+		}
+	}
+
+	if (duckWin > peepWin) { cout << "The Rubber Ducks defeat the Snow Stealing Peeps!" << endl; }
+	else if (peepWin > duckWin) {
+		cout << "The Snow Stealing Peeps slipped through the Rubber Ducks Fingers.";
+		cout << "Better luck next time." << endl;
+	}
+	cout << "Thanks for playing!" << endl;
+
+	return 0;
+}
+
+char getChoice(string roundAction) {
+	char action = 'M';
+	char roundA = roundAction[0];
+	do {
+		cout << "Move, Exit, Instructions, or " << roundAction << endl;
+		cin >> action;
+	} while (action != 'M' && action != 'E' && action != 'I' && action != roundA);
+
+	return action;
+}
+
+int aimAndShootDirection(vector<vector<int>> adjRooms, int currentRoom) {
+	int roomAim = 0;
+	vector<int> adjacentRooms = getAdjacentRooms(adjRooms, currentRoom);
+	do {
+		cout << "What room do you want to aim at?" << endl;
+		printAdjacentRooms(adjacentRooms);
+		cin >> roomAim;
+	} while (isValidMove(roomAim, getAdjacentRooms(adjRooms, currentRoom)) == false);
+
+	if (hazards[0] == roomAim) { cout << "You found the enemy! Good job!" << endl; return 1; }
+	else { return 0; }  // fail to hit enemy
+}
+
+int gettingNewLocation(int currentRoom, vector<vector<int>> adjRooms) {
+	while (!cin.fail()) {
+		int room = 0;
+		vector<int> adjacentRooms;
+
+		adjacentRooms = getAdjacentRooms(adjRooms, currentRoom);
+		printCurrentRoom(currentRoom);
+		printAdjacentRooms(adjacentRooms);
+		cout << "Where to? ";
+		cin >> room;
+		if (cin.fail()) { cout << "That is not a room" << endl; }
+		else if (isValidMove(room, getAdjacentRooms(adjRooms, currentRoom)) == true) {
+			currentRoom = room;
+			return currentRoom;
+		}
+		else { cout << "You can't get there from here." << endl; }
+	}
+}
+
+int getRoom(int currentRoom) {
+	int room = 0;
+	cin >> room;
+	if (room < 1 || room > 20) { currentRoom = rand() % 20 + 1; }
+	else { currentRoom = room; }
+	return currentRoom;
+}
+
+void displayHazardsNearby(vector<vector<int>> map, int currentRoom, int round) {
+	vector<int> adjacentRooms = getAdjacentRooms(map, currentRoom);
+	for (int i = 0; i < adjacentRooms.size(); i++) {
+		if (hazards[0] == adjacentRooms[i]) { cout << "I hear footsteps!" << endl; }
+		if (round == 2) { return; }
+
+		vector<int> adjacentAdjacentRooms = getAdjacentRooms(map, adjacentRooms[i]);
+		for (int j = 0; j < adjacentAdjacentRooms.size(); j++) {
+			if (hazards[0] == adjacentAdjacentRooms[j]) {
+				cout << "I smell marshmellows!" << endl;
+			}
+		}
+	}
+}
+int checkHazard(int& currentRoom) {
+	int result = -1;
+	for (int i = 0; i < HAZARDS_NUM; i++) {
+		if (currentRoom == hazards[i]) {
+			switch (i) {
+			case 0: cout << "Enemy attacks you before you can. You lose this round." <<
+				endl; result = 0; break;
+			case 1: currentRoom = rand() % 20 + 1; cout << "Vultures transport you to " <<
+				currentRoom << endl; break;
+			case 2: cout << "You got stuck in taffy. You lose this round." <<
+				endl; result = 0; break;
+			}
+		}
+	}
+	return result;
+}
+
+
+// getAdjacentRooms - lets you know what rooms you can directly move to from the current room.
+// @param map - 2-D vector of integers containing the game's room map
+// @param currentRoom - integer value indicating one's current location
+// @return integer vector containing list of rooms that it's legal to move to\
+
+vector<int> getAdjacentRooms(vector<vector<int>> map, int currentRoom) {
+	vector <int> getAdjacentRooms = map[currentRoom];
+	return getAdjacentRooms;
+}
+
+
+// isValidMove - can one directly move to a room from a given room number
+// @param to - proposed room to move to
+// @param connections - list of rooms adjacent to the current room
+// @return true if the room is adjacent, otherwise false
+
+bool isValidMove(int to, vector<int> connections) {
+	for (int i = 0; i < connections.size(); i++) {
+		if (to == connections[0] || to == connections[1] || to == connections[2]) { return true; }
+		else { return false; }
+	}
+}
+
+
+// printCurrentRoom - display message containing current room number.
+// @param room - current room number
+
+void printCurrentRoom(int room) {
+	cout << "You are in room " << room << endl;
+}
+
+
+// printAdjacentRooms - display message listing those rooms adjacent to the current room.
+// @param rooms - list of rooms adjacent to the current room.
+
+void printAdjacentRooms(vector<int> rooms) {
+	for (int i = 0; i < rooms.size(); i++) {
+		cout << rooms[i] << ", ";
+	}
+	cout << endl;
+}
+
+
+// Text displayed on screen
+
+void displayOverallInstructions() {
+	cout << "Welcome to Rubber Ducks vs. Peeps Game" << endl;
+	cout << endl;
+	cout << "The Debugging Rubber Ducks are tracking down the evil Snow Stealing Peeps living in a 20 - room cave system." << endl;
+	cout << "The Snow Stealing Peeps are taking all the snow and magically creating snow beasties." << endl;
+	cout << "Using their cunning skill and logic, the rubber ducks are going to hunt down the snow stealing peeps." << endl;
+	cout << "The peeps cannot hide their sugary stench smell or muffle their squishy marshmallow footsteps." << endl;
+	cout << endl;
+	cout << "This text - based adventure game will have three rounds." << endl;
+	cout << "In round 1 and round 3, the user will be playing the role of the rubber ducks." << endl;
+	cout << "In round 2, the tables will be turned, and the user will be play as the Snow Stealer Peeps." << endl;
+	cout << "For each round, you will be moving through the cave system trying to find your enemy." << endl;
+	cout << "You can move to any of the ajointing rooms. You can also view the instructors or exit the game." << endl;
+	cout << "You will have a warning that you will be approaching your enemy if you hear footsteps or smell sugar." << endl;
+	cout << "If you think you have located the enemy, you can use your candy cane arrow(round 1)" <<
+		" or toothpick sword(round 2 or 3) to capture the enemy and win around." << endl;
+	cout << endl;
+	cout << "Hazards:" << endl;
+	cout << "Taffy - the rubber ducks or peeps can get 'stuck' on the taffy and this will end the game / round." << endl;
+	cout << "Vultures - these carry ducks or peeps to a random location within the cave system" << endl;
+
+}
+
+void fillHazards() {
+	for (int i = 0; i < HAZARDS_NUM; i++) { hazards[i] = rand() % 20 + 1; }
+}
